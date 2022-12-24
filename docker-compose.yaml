@@ -1,0 +1,13 @@
+version: '3'
+volumes:
+  node_modules:
+services:
+  node:
+    build:
+      context: ./frontend
+    tty: true
+    volumes:
+      - ./frontend:/app
+      - node_modules:/app/node_modules
+    ports:
+      - 5173:5173
