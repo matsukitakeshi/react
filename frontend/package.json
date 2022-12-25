@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "tslint-check": "tslint-config-prettier-check ./tslint.json"
   },
   "dependencies": {
     "@material-ui/core": "^4.12.4",
@@ -25,6 +26,7 @@
     "prettier": "^2.8.1",
     "tslint": "^6.1.3",
     "tslint-config-prettier": "^1.18.0",
+    "tslint-plugin-prettier": "^2.3.0",
     "typescript": "^4.9.3",
     "vite": "^4.0.0",
     "vite-tsconfig-paths": "^4.0.3"
