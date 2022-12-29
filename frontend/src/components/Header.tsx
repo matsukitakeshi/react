@@ -27,7 +27,6 @@ export default function ButtonAppBar() {
 
   return (
     <div className={classes.root}>
-      {/* <Drawer /> */}
       <AppBar position="static">
         <Toolbar>
           <IconButton
