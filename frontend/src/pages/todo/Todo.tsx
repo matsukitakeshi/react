@@ -1,4 +1,3 @@
-import "../../App.css";
 import TitleForm from "../../components/TitleForm"
 import AddButton from "../../components/AddButton";
 import TodoList from "../../components/TodoList";

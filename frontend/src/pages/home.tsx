@@ -2,7 +2,10 @@
 function Home() {
 
     return (
-        <h1>home</h1>
+        <div>
+            <p>aaa</p>
+            <h1>home</h1>
+        </div>
     )
 }
 
