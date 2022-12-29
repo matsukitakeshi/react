@@ -1,6 +1,6 @@
-import { atom } from "recoil";
+import { atom } from 'recoil';
 
 export const todoTitleFormState = atom<string>({
-    key: "todoTitleForm",
-    default: '',
+  key: 'todoTitleForm',
+  default: '',
 });

@@ -1,5 +1,5 @@
 type Todo = {
-    title: string;
-}
+  title: string;
+};
 
 export default Todo;
