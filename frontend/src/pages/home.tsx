@@ -9,6 +9,9 @@ function Home() {
         <li>
           <Link to="/todo">TODO</Link>
         </li>
+        <li>
+          <Link to="/draw">Draw</Link>
+        </li>
       </ul>
     </div>
   );
