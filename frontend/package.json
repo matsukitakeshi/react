@@ -13,11 +13,14 @@
     "@material-ui/core": "^4.12.4",
     "@material-ui/icons": "^4.11.3",
     "@types/react-router-dom": "^5.3.3",
+    "konva": "^8.4.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-konva": "^18.2.5",
     "react-router": "^6.6.1",
     "react-router-dom": "^6.6.1",
-    "recoil": "^0.7.6"
+    "recoil": "^0.7.6",
+    "use-image": "^1.1.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.26",
