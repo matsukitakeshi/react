@@ -107,7 +107,6 @@ const Draw: React.FC = () => {
                     points={[attrs.x, 0, attrs.x, attrs.y, attrs.x, HEIGHT]}
                     stroke='black'
                     tension={0.5}
-                    closed
                 />)
             }
 
@@ -118,7 +117,6 @@ const Draw: React.FC = () => {
                     points={[0, attrs.y, attrs.x, attrs.y, WIDTH, attrs.y]}
                     stroke='black'
                     tension={0.5}
-                    closed
                 />)
             }
         })
@@ -140,7 +138,7 @@ const Draw: React.FC = () => {
                                 width={WIDTH}
                                 stroke="black"
                                 strokeWidth={10}
-            
+                                fillEnabled={false}
                             />
                             <Line
                                 // LOS
