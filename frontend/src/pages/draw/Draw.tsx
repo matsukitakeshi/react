@@ -1,5 +1,9 @@
-import React, {DragEvent} from 'react';
-import { Stage, Layer, Rect, Text, Circle, Line } from 'react-konva';
+import React, {DragEvent, useState} from 'react';
+import { Stage, Layer, Rect, Circle, Line } from 'react-konva';
+import { SameHeightLinesState } from 'atoms/draw/SameHeightLinesAtom';
+import { SameWidthLinesState } from 'atoms/draw/SameWidthLinesAtom';
+import { CirclesState } from 'atoms/draw/CiclesAtom';
+import { useRecoilValue, useSetRecoilState, SetterOrUpdater } from 'recoil';
 
 const Draw: React.FC = () => {
 
@@ -22,55 +26,9 @@ const Draw: React.FC = () => {
 
     // 縦横それぞれ、100%分の何％かを保存するようにする
 
-    let aligns: Align[] = [
-        // TODO: default値を作成
-        // TODO: backendから取得するようにする
-        {
-            "x": 10,
-            "y": 65,
-        },
-        {
-            "x": 30,
-            "y": 65,
-        },
-        {
-            "x": 34,
-            "y": 65,
-        },
-        {
-            "x": 34,
-            "y": 73,
-        },
-        {
-            "x": 34,
-            "y": 81,
-        },
-        {
-            "x": 34,
-            "y": 89,
-        },
-        {
-            "x": 38,
-            "y": 65,
-        },
-        {
-            "x": 42,
-            "y": 65,
-        },
-        {
-            "x": 50,
-            "y": 70,
-        },
-        {
-            "x": 80,
-            "y": 65,
-        },
-        {
-            "x": 26,
-            "y": 65,
-        },
-    ]
-
+    let aligns: Align[] = useRecoilValue(CirclesState)
+    const setAlign = useSetRecoilState(CirclesState)
+    console.log(aligns)
     let circles = []
 
     for (let i = 0; i < 11; i++) {
@@ -82,40 +40,45 @@ const Draw: React.FC = () => {
                 fill="black"
                 draggable
                 onDragMove={(e: DragEvent<HTMLDivElement>) => {
-                    writeLines(e.target.attrs)
+                    writeLines(e.target.attrs, i)
                 }}
                 onDragEnd={(e: DragEvent<HTMLDivElement>) => {
-                    aligns[i].x = toPercentX(e.target.attrs.x)
-                    aligns[i].y = toPercentY(e.target.attrs.y)
+                    setAlign(aligns.map((align, index) => (
+                        index === i ?
+                        {x: toPercentX(e.target.attrs.x), y: toPercentY(e.target.attrs.y)} :
+                        align
+                    )))
                 }}
                 key={i}
             />
         )
     }
 
-    let sameHeightLines = []
-    let sameWidthLines = []
+    const sameHeightLines = useRecoilValue(SameHeightLinesState)
+    const sameWidthLines = useRecoilValue(SameWidthLinesState)
+    const setSameHeightLines = useSetRecoilState(SameHeightLinesState)
+    const setSameWidthLines = useSetRecoilState(SameWidthLinesState)
 
-    const writeLines = (attrs) => {
-        sameHeightLines = []
-        sameWidthLines = []
+    const writeLines = (attrs, i: number) => {
+        setSameHeightLines("")
+        setSameWidthLines("")
         aligns.map((align, index) => {
-            if (align.x == toPercentX(attrs.x)) {
-                sameWidthLines.push(<Line
+            if (align.x == toPercentX(attrs.x) && i != index) {
+                setSameHeightLines(<Line
                     x={0}
                     y={0}
                     points={[attrs.x, 0, attrs.x, attrs.y, attrs.x, HEIGHT]}
-                    stroke='black'
+                    stroke='red'
                     tension={0.5}
                 />)
             }
 
-            if (align.y == toPercentY(attrs.y)) {
-                sameHeightLines.push(<Line
+            if (align.y == toPercentY(attrs.y) && i != index) {
+                setSameWidthLines(<Line
                     x={0}
                     y={0}
                     points={[0, attrs.y, attrs.x, attrs.y, WIDTH, attrs.y]}
-                    stroke='black'
+                    stroke='red'
                     tension={0.5}
                 />)
             }
