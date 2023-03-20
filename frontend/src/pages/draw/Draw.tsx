@@ -3,6 +3,7 @@ import { Stage, Layer, Rect, Circle, Line } from 'react-konva';
 import { SameHeightLinesState } from 'atoms/draw/SameHeightLinesAtom';
 import { SameWidthLinesState } from 'atoms/draw/SameWidthLinesAtom';
 import { CirclesState } from 'atoms/draw/CiclesAtom';
+import { DefenceState } from 'atoms/draw/DefenceAtom';
 import { useRecoilValue, useSetRecoilState, SetterOrUpdater } from 'recoil';
 
 const Draw: React.FC = () => {
@@ -27,9 +28,12 @@ const Draw: React.FC = () => {
     // 縦横それぞれ、100%分の何％かを保存するようにする
 
     let aligns: Align[] = useRecoilValue(CirclesState)
+    let defenceAligns: Align[] = useRecoilValue(DefenceState)
+
     const setAlign = useSetRecoilState(CirclesState)
-    console.log(aligns)
+    const setDefenceAlign = useSetRecoilState(DefenceState)
     let circles = []
+    let defences = []
 
     for (let i = 0; i < 11; i++) {
         circles.push(
@@ -48,6 +52,20 @@ const Draw: React.FC = () => {
                         {x: toPercentX(e.target.attrs.x), y: toPercentY(e.target.attrs.y)} :
                         align
                     )))
+                }}
+                key={i}
+            />
+        )
+        defences.push(
+            <Line
+                x={defenceAligns[i].x * WIDTH / 100}
+                y={defenceAligns[i].y * HEIGHT / 100}
+                points={[0, 0, 20, 20, 40, 0]}
+                stroke="black"
+                draggable
+                onDragMove={(e: DragEvent<HTMLDivElement>) => {
+                }}
+                onDragEnd={(e: DragEvent<HTMLDivElement>) => {
                 }}
                 key={i}
             />
@@ -94,6 +112,9 @@ const Draw: React.FC = () => {
                     <Stage width={WIDTH} height={HEIGHT}>
                         <Layer>
                             {circles}
+                            {defences}
+                            {sameHeightLines}
+                            {sameWidthLines}
                             <Rect
                                 x={0}
                                 y={0}
@@ -127,8 +148,6 @@ const Draw: React.FC = () => {
                                 tension={0.5}
                                 stroke="black"
                             />
-                            {sameHeightLines}
-                            {sameWidthLines}
                         </Layer>
                     </Stage>
                 </div>
