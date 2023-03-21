@@ -1,4 +1,4 @@
-import React, {DragEvent, useState} from 'react';
+import React, {DragEvent, MouseEvent, useState} from 'react';
 import { Stage, Layer, Rect, Circle, Line } from 'react-konva';
 import { SameHeightLinesState } from 'atoms/draw/SameHeightLinesAtom';
 import { SameWidthLinesState } from 'atoms/draw/SameWidthLinesAtom';
@@ -6,12 +6,17 @@ import { CirclesState } from 'atoms/draw/CiclesAtom';
 import { DefenceState } from 'atoms/draw/DefenceAtom';
 import { AssignmentLinesState } from 'atoms/draw/AssignmentLines';
 import { useRecoilValue, useSetRecoilState, SetterOrUpdater } from 'recoil';
+import { DrawLinesState } from 'atoms/draw/DrawLines';
 
 const Draw: React.FC = () => {
 
     type Align = {
         "x": number,
         "y": number,
+    }
+
+    type AssignmentLine = {
+        "points": number[],
     }
 
     const HEIGHT: number = window.innerHeight;
@@ -26,8 +31,6 @@ const Draw: React.FC = () => {
         return Math.floor(y / HEIGHT * 100)
     }
 
-    // 縦横それぞれ、100%分の何％かを保存するようにする
-
     let offenceAligns: Align[] = useRecoilValue(CirclesState)
     let defenceAligns: Align[] = useRecoilValue(DefenceState)
 
@@ -39,6 +42,40 @@ const Draw: React.FC = () => {
 
     const setSameHeightLines = useSetRecoilState(SameHeightLinesState)
     const setSameWidthLines = useSetRecoilState(SameWidthLinesState)
+
+    const assignmentLines = useRecoilValue(AssignmentLinesState)
+    const drawLine = useRecoilValue(DrawLinesState)
+
+    const setAssignmentLines = useSetRecoilState(AssignmentLinesState)
+    const setDrawLine = useSetRecoilState(DrawLinesState)
+
+    const handleOnMouseDown = (e: MouseEvent) => {
+        const position = e.target.getStage().getPointerPosition()
+        const { x, y } = position
+        setDrawLine({
+            points: [x, y]
+        })
+    }
+
+    const handleOnMouseMove = (e: MouseEvent) => {
+        if (!drawLine.points) return
+
+        const position = e.target.getStage().getPointerPosition()
+        const { x, y } = position
+        setDrawLine({
+            points: [...drawLine.points, x, y]
+        })
+    }
+
+    const handleMouseUp = () => {
+        if (!drawLine.points) return
+
+        setAssignmentLines([
+        ...assignmentLines,
+        { points: drawLine.points }
+        ])
+        setDrawLine([])
+    }
 
     let offences: Array<object> = []
     let defences: Array<object> = []
@@ -73,7 +110,7 @@ const Draw: React.FC = () => {
             <Line
                 x={defenceAligns[i].x * WIDTH / 100}
                 y={defenceAligns[i].y * HEIGHT / 100}
-                points={[0, 0, 20, 20, 40, 0]}
+                points={[0, 0, WIDTH / 120, WIDTH / 120, WIDTH / 60, 0]}
                 stroke="black"
                 draggable
                 onDragMove={(e: DragEvent<HTMLDivElement>) => {
@@ -116,16 +153,37 @@ const Draw: React.FC = () => {
     return (
         <div>
             <h2>Draw</h2>
-            <button>アサイン</button>
             <div>
                 <div>
-                    <Stage width={WIDTH} height={HEIGHT}>
+                    <Stage
+                        width={WIDTH}
+                        height={HEIGHT}
+                        onMouseDown={handleOnMouseDown}
+                        onMouseMove={handleOnMouseMove}
+                        onMouseUp={handleMouseUp}
+                    >
                         <Layer>
                             {offences}
-                            {defences}
                             {sameHeightLines}
                             {sameWidthLines}
-                            <Rect
+                        </Layer>
+                        <Layer>
+                            {defences}
+                        </Layer>
+                        <Layer>
+                            {[...assignmentLines, drawLine].map((line, index) => (
+                                <Line
+                                    key={index}
+                                    points={line.points}
+                                    fill="black"
+                                    stroke="black"
+                                    lineCap="round"
+                                    draggable={true}
+                                />
+                            ))}
+                        </Layer>
+                        <Layer>
+                        <Rect
                                 x={0}
                                 y={0}
                                 height={HEIGHT}
