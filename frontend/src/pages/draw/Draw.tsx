@@ -4,6 +4,7 @@ import { SameHeightLinesState } from 'atoms/draw/SameHeightLinesAtom';
 import { SameWidthLinesState } from 'atoms/draw/SameWidthLinesAtom';
 import { CirclesState } from 'atoms/draw/CiclesAtom';
 import { DefenceState } from 'atoms/draw/DefenceAtom';
+import { AssignmentLinesState } from 'atoms/draw/AssignmentLines';
 import { useRecoilValue, useSetRecoilState, SetterOrUpdater } from 'recoil';
 
 const Draw: React.FC = () => {
@@ -13,8 +14,8 @@ const Draw: React.FC = () => {
         "y": number,
     }
 
-    const HEIGHT = window.innerHeight;
-    const WIDTH = window.innerWidth;
+    const HEIGHT: number = window.innerHeight;
+    const WIDTH: number = window.innerWidth;
 
     const toPercentX = (x: number) => {
         return Math.floor(x / WIDTH * 100)
@@ -27,19 +28,27 @@ const Draw: React.FC = () => {
 
     // 縦横それぞれ、100%分の何％かを保存するようにする
 
-    let aligns: Align[] = useRecoilValue(CirclesState)
+    let offenceAligns: Align[] = useRecoilValue(CirclesState)
     let defenceAligns: Align[] = useRecoilValue(DefenceState)
 
-    const setAlign = useSetRecoilState(CirclesState)
+    const setOffenceAlign = useSetRecoilState(CirclesState)
     const setDefenceAlign = useSetRecoilState(DefenceState)
-    let circles = []
-    let defences = []
+
+    const sameHeightLines = useRecoilValue(SameHeightLinesState)
+    const sameWidthLines = useRecoilValue(SameWidthLinesState)
+
+    const setSameHeightLines = useSetRecoilState(SameHeightLinesState)
+    const setSameWidthLines = useSetRecoilState(SameWidthLinesState)
+
+    let offences: Array<object> = []
+    let defences: Array<object> = []
 
     for (let i = 0; i < 11; i++) {
-        circles.push(
+        offences = [
+            ...offences, 
             <Circle
-                x={aligns[i].x * WIDTH / 100}
-                y={aligns[i].y * HEIGHT / 100}
+                x={offenceAligns[i].x * WIDTH / 100}
+                y={offenceAligns[i].y * HEIGHT / 100}
                 radius={WIDTH / 60}
                 fill="black"
                 draggable
@@ -47,16 +56,20 @@ const Draw: React.FC = () => {
                     writeLines(e.target.attrs, i)
                 }}
                 onDragEnd={(e: DragEvent<HTMLDivElement>) => {
-                    setAlign(aligns.map((align, index) => (
+                    setOffenceAlign(offenceAligns.map((align, index) => (
                         index === i ?
                         {x: toPercentX(e.target.attrs.x), y: toPercentY(e.target.attrs.y)} :
                         align
                     )))
+                    setSameHeightLines([])
+                    setSameWidthLines([])
                 }}
                 key={i}
             />
-        )
-        defences.push(
+        ]
+
+        defences = [
+            ...defences,
             <Line
                 x={defenceAligns[i].x * WIDTH / 100}
                 y={defenceAligns[i].y * HEIGHT / 100}
@@ -67,20 +80,16 @@ const Draw: React.FC = () => {
                 }}
                 onDragEnd={(e: DragEvent<HTMLDivElement>) => {
                 }}
+                strokeWidth={4}
                 key={i}
             />
-        )
+        ]
     }
 
-    const sameHeightLines = useRecoilValue(SameHeightLinesState)
-    const sameWidthLines = useRecoilValue(SameWidthLinesState)
-    const setSameHeightLines = useSetRecoilState(SameHeightLinesState)
-    const setSameWidthLines = useSetRecoilState(SameWidthLinesState)
-
-    const writeLines = (attrs, i: number) => {
+    const writeLines = (attrs: Align, i: number) => {
         setSameHeightLines("")
         setSameWidthLines("")
-        aligns.map((align, index) => {
+        offenceAligns.map((align: Align, index: number) => {
             if (align.x == toPercentX(attrs.x) && i != index) {
                 setSameHeightLines(<Line
                     x={0}
@@ -107,11 +116,12 @@ const Draw: React.FC = () => {
     return (
         <div>
             <h2>Draw</h2>
+            <button>アサイン</button>
             <div>
                 <div>
                     <Stage width={WIDTH} height={HEIGHT}>
                         <Layer>
-                            {circles}
+                            {offences}
                             {defences}
                             {sameHeightLines}
                             {sameWidthLines}
